@@ -17,7 +17,6 @@ def chatting(sock, nickname, friend):
         
 
 
-port = 5001
 s = socket.socket()
 
 nickname = input("Entre com nome de usuário: ")
@@ -27,6 +26,7 @@ action = input(" [1] Conectar a um usuário\n [2] Esperar por conexão\n>> ")
 
 if action == "1":
     host = input("Endereço IPv4 do usuário: ")
+    port = int(input("Porta de conexão: "))
     s.connect((host, port))
 
     s.send(nickname.encode())
@@ -39,6 +39,7 @@ if action == "1":
 else:
     if action == "2":
         host = "127.0.0.1"
+        port = int(input("Porta de conexão: "))
 
         s.bind(('', port))
         s.listen(5)

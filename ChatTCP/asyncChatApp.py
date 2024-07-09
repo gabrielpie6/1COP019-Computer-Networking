@@ -15,11 +15,12 @@ def do_Connection(sender, app_data, user_data):
     
     host     = dpg.get_value("input_host")
     nickname = dpg.get_value("input_nickname")
+    port     = int(dpg.get_value("input_port"))
 
     show_second_window(sender, app_data, user_data)
 
-    listen_thread = threading.Thread(target=listen_on_port, args=(5001,))
-    send_thread   = threading.Thread(target=send_to_port,   args=(host, 5001, nickname))
+    listen_thread = threading.Thread(target=listen_on_port, args=(port,))
+    send_thread   = threading.Thread(target=send_to_port,   args=(host, port, nickname))
 
     listen_thread.start()
     send_thread.start()
@@ -101,26 +102,27 @@ def show_second_window(sender, app_data, user_data):
         shared_queue.put("\leave")
         dpg.stop_dearpygui()
 
-    with dpg.window(width=300, height=400, tag="mainContainer", label="Janela de Conversa"):
+    with dpg.window(width=420, height=400, tag="mainContainer", label="Janela de Conversa"):
         with dpg.group(horizontal=False):
             with dpg.child_window(tag="scrolling_region", width=-1, height=335, border=False):
                 dpg.add_text("", tag="output_text")
                 dpg.set_y_scroll("scrolling_region", dpg.get_y_scroll_max("scrolling_region"))
         with dpg.group(horizontal=True):
-            dpg.add_input_text(label="", tag="input_text", default_value="mensagem", on_enter=True, callback=on_enter_pressed, user_data=True, width=230)
+            dpg.add_input_text(label="", tag="input_text", default_value="mensagem", on_enter=True, callback=on_enter_pressed, user_data=True, width=330)
             dpg.add_button(label="Sair", callback=close_connection)
 
 dpg.create_context()
 
 # Criando a primeira janela
-with dpg.window(label="Janela de Conexao", width=300, height=220, tag="primeira_janela"):
-    dpg.add_input_text(default_value="", label="Host IPv4", tag="input_host")
+with dpg.window(label="Janela de Conexao", width=420, height=220, tag="primeira_janela"):
     dpg.add_input_text(label="Nickname", tag="input_nickname")
+    dpg.add_input_text(default_value="", label="Endereço IPv4",    tag="input_host")
+    dpg.add_input_text(default_value="", label="Porta de conexão", tag="input_port")
     dpg.add_button(label="Confirmar", callback=do_Connection)
 
 
 
-dpg.create_viewport(title='ChatTCP Assincrono', width=300, height=220)
+dpg.create_viewport(title='ChatTCP Assincrono', width=420, height=220)
 dpg.setup_dearpygui()
 dpg.show_viewport()
 dpg.start_dearpygui()

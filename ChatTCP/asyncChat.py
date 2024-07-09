@@ -53,13 +53,14 @@ def send_to_port(host, port):
 
 nickname = input("Entre com nome de usuário: ")
 host     = input("Endereço IPv4 do usuário: ")
+port     = int(input("Porta de conexão: "))
 
 
 
 
 # Criação das threads
-listen_thread = threading.Thread(target=listen_on_port, args=(5004,))
-send_thread   = threading.Thread(target=send_to_port,   args=(host, 5004))
+listen_thread = threading.Thread(target=listen_on_port, args=(port,))
+send_thread   = threading.Thread(target=send_to_port,   args=(host, port))
     
 
 
