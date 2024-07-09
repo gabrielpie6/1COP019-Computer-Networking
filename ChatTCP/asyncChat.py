@@ -1,10 +1,11 @@
 import socket
 import threading
 
-# Função para ouvir mensagens na porta 5001
+#
+# Função de escuta de mensagens controlada por Thread
 def listen_on_port(port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
-        server_socket.bind(('localhost', port))
+        server_socket.bind(('', port))
         server_socket.listen(5)
         print(f"Esperando por conexões na porta {port}...")
         
@@ -18,52 +19,51 @@ def listen_on_port(port):
                     break
                 print(f"[{friend}]: {data.decode()}\n")
 
-# Função para enviar mensagens para a porta 5001
+
+#
+# Funcao de envio de mensagens controlada por Thread
 def send_to_port(host, port):
     global nickname
     global friend
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
+    # Tenta se conectar ao host na porta especificada
     while True:
         try:
             client_socket.connect((host, port))
             break
         except ConnectionRefusedError:
-            # print("Connection refused. Retrying...")
             continue
-    # client_socket.connect((host, 5002))
+
 
     client_socket.sendall(nickname.encode())
 
+    # Enquanto a conexão não for fechada pelo usuário, envia mensagens vindas da entrada de teclado
     while True:
         message = input(f"[{nickname}]: ")
-        #print(f"[{nickname}]: {message}")
+        if message == "\leave":
+            break
         client_socket.sendall(message.encode())
+    client_socket.close()
+
+
+
 
 
 
 nickname = input("Entre com nome de usuário: ")
-host = input("Endereço IPv4 do usuário: ")
+host     = input("Endereço IPv4 do usuário: ")
 
-action = input(" [1] Conectar a um usuário\n [2] Esperar por conexão\n>> ")
 
-listen_thread = threading.Thread(target=None, args=(0,))
-send_thread   = threading.Thread(target=None, args=(0,))
 
-if action == "1":
-    listen_thread = threading.Thread(target=listen_on_port, args=(5001,))
-    send_thread   = threading.Thread(target=send_to_port,   args=(host, 5002))
-else:
-    if action == "2":
-        listen_thread = threading.Thread(target=listen_on_port, args=(5002,))
-        send_thread   = threading.Thread(target=send_to_port,   args=(host, 5001))
+
+# Criação das threads
+listen_thread = threading.Thread(target=listen_on_port, args=(5004,))
+send_thread   = threading.Thread(target=send_to_port,   args=(host, 5004))
     
 
 
-# Criação e início das threads
-# listen_thread = threading.Thread(target=listen_on_port)
-# send_thread = threading.Thread(target=send_to_port, args=(host,))
-
+# Início das threads
 listen_thread.start()
 send_thread.start()
 
